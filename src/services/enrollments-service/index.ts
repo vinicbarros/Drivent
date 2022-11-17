@@ -1,22 +1,30 @@
-import { request } from "@/utils/request";
-import { notFoundError, requestError } from "@/errors";
+//import { request } from "@/utils/request";
+import { AddressEnrollment } from "@/protocols";
+import { getAddress } from "@/utils/cep-service";
+import { notFoundError } from "@/errors";
 import addressRepository, { CreateAddressParams } from "@/repositories/address-repository";
 import enrollmentRepository, { CreateEnrollmentParams } from "@/repositories/enrollment-repository";
 import { exclude } from "@/utils/prisma-utils";
 import { Address, Enrollment } from "@prisma/client";
-import { ViaCEPAddress, ViaCEPAddressEntity } from "@/protocols";
 
-async function getAddressFromCEP(CEP: string): Promise<ViaCEPAddress> {
-  const result: ViaCEPAddressEntity = (await request.get(`https://viacep.com.br/ws/${CEP}/json/`)).data;
+async function getAddressFromCEP(cep: string): Promise<AddressEnrollment> {
+  const result = await getAddress(cep);
 
   if (!result) {
-    throw notFoundError();
+    throw notFoundError(); //lançar -> pro arquivo que chamou essa função
   }
 
-  return {
-    ...exclude(result, "cep", "ddd", "siafi", "ibge", "gia", "localidade"),
-    cidade: result.localidade,
+  const { bairro, localidade, uf, complemento, logradouro } = result;
+
+  const address = {
+    bairro,
+    cidade: localidade,
+    uf,
+    complemento,
+    logradouro,
   };
+
+  return address;
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
@@ -48,13 +56,6 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
   const address = getAddressForUpsert(params.address);
 
   //TODO - Verificar se o CEP é válido
-
-  const result = await request.get(`https://viacep.com.br/ws/${address.cep}/json/`);
-
-  if (result.data.erro) {
-    throw requestError(400, "CEP isn't valid!");
-  }
-
   const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, "userId"));
   await addressRepository.upsert(newEnrollment.id, address, address);
 }
