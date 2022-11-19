@@ -10,8 +10,7 @@ async function getTicketsTypes() {
 async function getTickets(userId: number) {
   const tickets = await ticketsRepository.findTicketsByUserId(userId);
 
-  if (tickets.length === 0) throw notFoundError();
-  if (tickets.length === 1) return tickets[0];
+  if (!tickets) throw notFoundError();
 
   return tickets;
 }
