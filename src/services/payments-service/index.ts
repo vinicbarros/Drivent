@@ -1,10 +1,11 @@
-import { notFoundError, requestError } from "@/errors";
+import { notFoundError, unauthorizedError } from "@/errors";
+import { badRequestError } from "@/errors/bad-request-error";
 import { CardData } from "@/protocols";
 import paymentsRepository from "@/repositories/payment-repository";
 import ticketsRepository from "@/repositories/ticket-repository";
 
 async function getPaymentsByTicketId(ticketId: number, userId: number) {
-  if (!ticketId) throw requestError(400, "ticketId is null.");
+  if (!ticketId) throw badRequestError();
 
   await handleTicketsValidation(ticketId, userId);
 
@@ -14,7 +15,7 @@ async function getPaymentsByTicketId(ticketId: number, userId: number) {
 }
 
 async function insertNewPayment(ticketId: number, userId: number, cardData: CardData) {
-  if (!ticketId || !cardData) throw requestError(400, "ticketId is null.");
+  if (!ticketId || !cardData) throw badRequestError();
 
   const { ticket, ticketType } = await handleTicketsValidation(ticketId, userId);
 
@@ -29,7 +30,7 @@ async function handleTicketsValidation(ticketId: number, userId: number) {
   if (!ticket) throw notFoundError();
 
   const userOwnTicket = await ticketsRepository.findTicketsByTicketIdAndUserId(ticketId, userId);
-  if (!userOwnTicket) throw requestError(401, "The user doesn't own the ticket.");
+  if (!userOwnTicket) throw unauthorizedError();
 
   const ticketType = await ticketsRepository.findTicketTypeById(ticket.ticketTypeId);
   const ticketData = {

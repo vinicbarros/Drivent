@@ -12,7 +12,7 @@ export async function getPayments(req: AuthenticatedRequest, res: Response) {
     res.status(httpStatus.OK).send(payments);
   } catch (error) {
     if (error.name === "NotFoundError") return res.sendStatus(httpStatus.NOT_FOUND);
-    if (error.status === 401) return res.sendStatus(httpStatus.UNAUTHORIZED);
+    if (error.name === "UnauthorizedError") return res.sendStatus(httpStatus.UNAUTHORIZED);
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
@@ -26,7 +26,7 @@ export async function processPayments(req: AuthenticatedRequest, res: Response) 
     res.status(httpStatus.OK).send(newPayment);
   } catch (error) {
     if (error.name === "NotFoundError") return res.sendStatus(httpStatus.NOT_FOUND);
-    if (error.status === 401) return res.sendStatus(httpStatus.UNAUTHORIZED);
+    if (error.name === "UnauthorizedError") return res.sendStatus(httpStatus.UNAUTHORIZED);
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
