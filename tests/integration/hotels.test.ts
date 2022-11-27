@@ -43,9 +43,19 @@ describe("GET /hotels", () => {
   });
 
   describe("When token is valid", () => {
+    it("should respond with status 404 if the user doesn't have a enrollment", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+
+      const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
+
+      expect(response.statusCode).toBe(httpStatus.NOT_FOUND);
+    });
+
     it("should respond with status 401 if the user doesn't have a ticket", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
+      await createEnrollmentWithAddress(user);
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
@@ -159,6 +169,15 @@ describe("GET /hotels/:hotelId", () => {
     expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
   });
   describe("When token is valid", () => {
+    it("should respond with status 404 if the user doesn't have a enrollment", async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+
+      const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
+
+      expect(response.statusCode).toBe(httpStatus.NOT_FOUND);
+    });
+
     it("should respond with status 401 if the user doesn't have a ticket", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
