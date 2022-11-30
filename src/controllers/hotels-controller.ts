@@ -12,6 +12,7 @@ export async function getHotels(req: AuthenticatedRequest, res: Response) {
   } catch (error) {
     if (error.name === "NotFoundError") return res.sendStatus(httpStatus.NOT_FOUND);
     if (error.name === "UnauthorizedError") return res.sendStatus(httpStatus.UNAUTHORIZED);
+    if (error.name === "ForbiddenError") return res.sendStatus(httpStatus.FORBIDDEN);
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
@@ -28,6 +29,7 @@ export async function getRooms(req: AuthenticatedRequest, res: Response) {
     if (error.name === "NotFoundError") return res.sendStatus(httpStatus.NOT_FOUND);
     if (error.name === "BadRequestError") return res.sendStatus(httpStatus.BAD_REQUEST);
     if (error.name === "UnauthorizedError") return res.sendStatus(httpStatus.UNAUTHORIZED);
+    if (error.name === "ForbiddenError") return res.sendStatus(httpStatus.FORBIDDEN);
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
