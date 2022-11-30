@@ -71,7 +71,7 @@ describe("GET /hotels", () => {
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
-      expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 401 if the TicketType is remote", async () => {
@@ -85,7 +85,7 @@ describe("GET /hotels", () => {
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
-      expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 401 if the TicketType doesn't includes hotel ", async () => {
@@ -99,7 +99,7 @@ describe("GET /hotels", () => {
 
       const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
-      expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with empty array when there are no hotels created", async () => {
@@ -200,7 +200,7 @@ describe("GET /hotels/:hotelId", () => {
 
       const response = await server.get(`/hotels/${number}`).set("Authorization", `Bearer ${token}`);
 
-      expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 401 if the TicketType is remote", async () => {
@@ -216,7 +216,7 @@ describe("GET /hotels/:hotelId", () => {
 
       const response = await server.get(`/hotels/${number}`).set("Authorization", `Bearer ${token}`);
 
-      expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 401 if the TicketType doesn't includes hotel ", async () => {
@@ -232,7 +232,7 @@ describe("GET /hotels/:hotelId", () => {
 
       const response = await server.get(`/hotels/${number}`).set("Authorization", `Bearer ${token}`);
 
-      expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
+      expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
     it("should respond with status 400 if the params isn't a number", async () => {
