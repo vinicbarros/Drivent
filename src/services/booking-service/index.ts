@@ -1,15 +1,14 @@
-import { notFoundError } from "@/errors";
+import { notFoundError, unauthorizedError } from "@/errors";
+import { badRequestError } from "@/errors/bad-request-error";
 import { forbiddenError } from "@/errors/forbidden-error";
 import bookingRepository from "@/repositories/booking-repository";
 import hotelsRepository from "@/repositories/hotels-repository";
-import hotelsService from "../hotels-service";
+import { validateTicketType } from "@/utils/ticket-type-helper";
 
 async function getBooking(userId: number) {
-  const enrollmentId = (await hotelsService.userEnrollment(userId)).id;
-  await hotelsService.checkPaidTicket(enrollmentId);
+  await validateTicketType(userId);
 
   const booking = await bookingRepository.findBookingByUserId(userId);
-
   if (!booking) throw notFoundError();
 
   const room = await hotelsRepository.findRoom(booking.roomId);
@@ -28,19 +27,37 @@ async function getBooking(userId: number) {
 }
 
 async function postBooking(userId: number, roomId: number) {
-  const enrollmentId = (await hotelsService.userEnrollment(userId)).id;
-  await hotelsService.checkPaidTicket(enrollmentId);
+  if (!roomId) throw notFoundError();
+  await validateTicketType(userId);
 
   const room = await hotelsRepository.findRoom(roomId);
-
   if (!room) throw notFoundError();
 
   await checkRoomIsAvailable(room.id, room.capacity);
-
   const bookingCreated = await bookingRepository.postBooking(userId, roomId);
 
   return {
     bookingId: bookingCreated.id,
+  };
+}
+
+async function putBooking(userId: number, roomId: number, bookingId: number) {
+  if (!roomId) throw notFoundError();
+  await validateTicketType(userId);
+  if (!bookingId || isNaN(bookingId)) throw badRequestError();
+
+  const booking = await bookingRepository.findBookingById(bookingId);
+  if (!booking) throw notFoundError();
+  if (booking.userId !== userId) throw unauthorizedError();
+
+  const room = await hotelsRepository.findRoom(roomId);
+  if (!room) throw notFoundError();
+
+  await checkRoomIsAvailable(room.id, room.capacity);
+  const bookingUpdated = await bookingRepository.updateBooking(bookingId, roomId);
+
+  return {
+    bookingId: bookingUpdated.id,
   };
 }
 
@@ -53,6 +70,7 @@ async function checkRoomIsAvailable(roomId: number, capacity: number) {
 const bookingService = {
   getBooking,
   postBooking,
+  putBooking,
 };
 
 export default bookingService;
