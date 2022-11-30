@@ -1,5 +1,6 @@
-import { notFoundError, unauthorizedError } from "@/errors";
+import { notFoundError } from "@/errors";
 import { badRequestError } from "@/errors/bad-request-error";
+import { forbiddenError } from "@/errors/forbidden-error";
 import enrollmentRepository from "@/repositories/enrollment-repository";
 import hotelsRepository from "@/repositories/hotels-repository";
 import ticketsRepository from "@/repositories/ticket-repository";
@@ -34,7 +35,7 @@ async function checkPaidTicket(enrollmentId: number) {
   if (!ticket) throw notFoundError();
 
   if (ticket.status !== "PAID" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel)
-    throw unauthorizedError();
+    throw forbiddenError();
 }
 
 async function userEnrollment(userId: number) {
@@ -48,6 +49,8 @@ async function userEnrollment(userId: number) {
 const hotelsService = {
   getHotels,
   getRooms,
+  checkPaidTicket,
+  userEnrollment,
 };
 
 export default hotelsService;
