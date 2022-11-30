@@ -30,7 +30,7 @@ describe("GET /hotels", () => {
 
     const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
   });
 
   it("should respond with status 401 if there is no session for given token", async () => {
@@ -52,7 +52,7 @@ describe("GET /hotels", () => {
       expect(response.statusCode).toBe(httpStatus.NOT_FOUND);
     });
 
-    it("should respond with status 401 if the user doesn't have a ticket", async () => {
+    it("should respond with status 404 if the user doesn't have a ticket", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       await createEnrollmentWithAddress(user);
@@ -62,7 +62,7 @@ describe("GET /hotels", () => {
       expect(response.statusCode).toBe(httpStatus.NOT_FOUND);
     });
 
-    it("should respond with status 401 if the ticket isn't paid", async () => {
+    it("should respond with status 403 if the ticket isn't paid", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
@@ -74,7 +74,7 @@ describe("GET /hotels", () => {
       expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
-    it("should respond with status 401 if the TicketType is remote", async () => {
+    it("should respond with status 403 if the TicketType is remote", async () => {
       const includesHotel = false;
       const isRemote = true;
       const user = await createUser();
@@ -88,7 +88,7 @@ describe("GET /hotels", () => {
       expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
-    it("should respond with status 401 if the TicketType doesn't includes hotel ", async () => {
+    it("should respond with status 403 if the TicketType doesn't includes hotel ", async () => {
       const includesHotel = false;
       const isRemote = false;
       const user = await createUser();
@@ -157,7 +157,7 @@ describe("GET /hotels/:hotelId", () => {
 
     const response = await server.get("/hotels/:hotelId").set("Authorization", `Bearer ${token}`);
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(httpStatus.UNAUTHORIZED);
   });
 
   it("should respond with status 401 if there is no session for given token", async () => {
@@ -173,12 +173,14 @@ describe("GET /hotels/:hotelId", () => {
       const user = await createUser();
       const token = await generateValidToken(user);
 
-      const response = await server.get("/hotels").set("Authorization", `Bearer ${token}`);
+      const number = faker.datatype.number(50);
+
+      const response = await server.get(`/hotels/${number}`).set("Authorization", `Bearer ${token}`);
 
       expect(response.statusCode).toBe(httpStatus.NOT_FOUND);
     });
 
-    it("should respond with status 401 if the user doesn't have a ticket", async () => {
+    it("should respond with status 404 if the user doesn't have a ticket", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
 
@@ -189,7 +191,7 @@ describe("GET /hotels/:hotelId", () => {
       expect(response.statusCode).toBe(httpStatus.NOT_FOUND);
     });
 
-    it("should respond with status 401 if the ticket isn't paid", async () => {
+    it("should respond with status 403 if the ticket isn't paid", async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
@@ -203,7 +205,7 @@ describe("GET /hotels/:hotelId", () => {
       expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
-    it("should respond with status 401 if the TicketType is remote", async () => {
+    it("should respond with status 403 if the TicketType is remote", async () => {
       const includesHotel = false;
       const isRemote = true;
       const user = await createUser();
@@ -219,7 +221,7 @@ describe("GET /hotels/:hotelId", () => {
       expect(response.statusCode).toBe(httpStatus.FORBIDDEN);
     });
 
-    it("should respond with status 401 if the TicketType doesn't includes hotel ", async () => {
+    it("should respond with status 403 if the TicketType doesn't includes hotel ", async () => {
       const includesHotel = false;
       const isRemote = false;
       const user = await createUser();
