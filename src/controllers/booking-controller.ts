@@ -44,6 +44,7 @@ export async function updateBooking(req: AuthenticatedRequest, res: Response) {
     if (error.name === "NotFoundError") return res.sendStatus(httpStatus.NOT_FOUND);
     if (error.name === "UnauthorizedError") return res.sendStatus(httpStatus.UNAUTHORIZED);
     if (error.name === "ForbiddenError") return res.sendStatus(httpStatus.FORBIDDEN);
+    if (error.name === "BadRequestError") return res.sendStatus(httpStatus.BAD_REQUEST);
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
